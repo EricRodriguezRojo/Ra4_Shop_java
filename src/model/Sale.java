@@ -40,7 +40,19 @@ public class Sale {
 
 	@Override
 	public String toString() {
-		return "Sale [client=" + client + ", products=" + Arrays.toString(products) + ", amount=" + amount + "]";
+            
+               String mensaje = "Sale [client=" + client + ", Products: ";
+               
+               for(int i = 0; i < products.length; i++){
+                   if(products[i] != null){
+                        mensaje += products[i].toString();
+                   }                 
+               }
+               
+               mensaje += ", amount=" + amount + "]";
+               
+               return mensaje;
 	}
 
+       
 }

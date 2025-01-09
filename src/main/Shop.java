@@ -15,6 +15,7 @@ public class Shop {
 
     public Shop() {
         inventory = new Product[10];
+        sales = new Sale[10];
     }
 
     public static void main(String[] args) {
@@ -71,7 +72,7 @@ public class Shop {
                     shop.showSales();
                     break;
 
-                case 8:
+                case 10:
                     exit = true;
                     break;
             }
@@ -82,37 +83,53 @@ public class Shop {
      * load initial inventory to shop
      */
     public void loadInventory() {
+        
         addProduct(new Product("Manzana", 10.00, true, 10));
         addProduct(new Product("Pera", 20.00, true, 20));
         addProduct(new Product("Hamburguesa", 30.00, true, 30));
         addProduct(new Product("Fresa", 5.00, true, 20));
+
     }
 
     /**
      * show current total cash
      */
     private void showCash() {
-        System.out.println("Dinero actual: ");
+        System.out.println("Dinero actual: " + cash );
     }
 
     /**
      * add a new product to inventory getting data from console
      */
     public void addProduct() {
+        boolean doit = true;
         if (isInventoryFull()) {
             System.out.println("No se pueden añadir más productos");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Nombre: ");
-        String name = scanner.nextLine();
-        System.out.print("Precio mayorista: ");
-        double wholesalerPrice = scanner.nextDouble();
-        System.out.print("Stock: ");
-        int stock = scanner.nextInt();
+        
+            Scanner scanner = new Scanner(System.in);
+            
+            System.out.print("Nombre: ");
+            String name = scanner.nextLine();
+            
+            for (Product product : inventory) {
+                if (product!=null&&name.equals(product.getName())) {
+                    System.out.println("Este ya esta en el inventario!");
+                    doit = false;
+                    break;
+                }
+            }
+            if(doit == true){
+                System.out.print("Precio mayorista: ");
+                double wholesalerPrice = scanner.nextDouble();
+                System.out.print("Stock: ");
+                int stock = scanner.nextInt();
 
-        addProduct(new Product(name, wholesalerPrice, true, stock));
-    }
+                addProduct(new Product(name, wholesalerPrice, true, stock));
+            }
+        }
+    
 
     /**
      * add stock for a specific product
@@ -128,6 +145,7 @@ public class Shop {
             System.out.print("Seleccione la cantidad a añadir: ");
             int stock = scanner.nextInt();
             // update stock product
+            stock = stock + product.getStock();
             product.setStock(stock);
             System.out.println("El stock del producto " + name + " ha sido actualizado a " + product.getStock());
 
@@ -166,6 +184,12 @@ public class Shop {
 
     /**
      * make a sale of products to a client
+     * 
+     * 1. Pedir nombre cliente-
+     * 2. Identificar un producto (rellenar los datos del mismo).-
+     * 3. Almacenar el producto en un listado.-
+     * 4. Comprobar si quiero a�adir m�s productos-
+     * 5. Pasar por caja
      */
     public void sale() {
         // ask for client name
@@ -176,7 +200,9 @@ public class Shop {
         // sale product until input name is not 0
         double totalAmount = 0.0;
         String name = "";
+        Product[] cart = new Product[10];
         while (!name.equals("0")) {
+            boolean inventoryFull = false;
             System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
             name = sc.nextLine();
 
@@ -194,19 +220,47 @@ public class Shop {
                 if (product.getStock() == 0) {
                     product.setAvailable(false);
                 }
-                System.out.println("Producto añadido con éxito");
-            }
+                
+                for (int i = 0; i < cart.length; i++) {
+                    if(cart[i] == null){
+                        cart[i] = product;
+                        System.out.println("Producto añadido con éxito");
+                        
+                        //Cuando este lleno el carrito, 10
+                        if(cart.length -1 == i){
+                            inventoryFull = true;
+                        }
+                        break;
+                    }
+                }  
+            
+
 
             if (!productAvailable) {
                 System.out.println("Producto no encontrado o sin stock");
             }
+            if(inventoryFull == true){
+                System.out.println("El inventario se ha completado, no se pueden a�adir mas productos.");
+                break;
+            }
         }
-
-        // show cost total
-        totalAmount = totalAmount * TAX_RATE;
-        cash += totalAmount;
-        System.out.println("Venta realizada con éxito, total: " + totalAmount);
     }
+    // show cost total
+    totalAmount = totalAmount * TAX_RATE;
+    cash += totalAmount;
+    //create new sell
+    //String client, Product[] products, double amount
+
+    for (int i = 0; i < sales.length; i++) {
+        if (sales[i] == null){
+            Sale sell = new Sale(client, cart, totalAmount );
+            sales[i] = sell;
+            break;
+        }
+    }
+    System.out.println("Venta realizada con éxito, total: " + totalAmount);
+
+}
 
     /**
      * show all sales
@@ -215,7 +269,7 @@ public class Shop {
         System.out.println("Lista de ventas:");
         for (Sale sale : sales) {
             if (sale != null) {
-                System.out.println(sale);
+                System.out.println(sale.toString());
             }
         }
     }

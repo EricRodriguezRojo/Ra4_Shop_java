@@ -9,7 +9,7 @@ public class Product {
 	private int stock;
 	private static int totalProducts;
 
-	static double EXPIRATION_RATE = 0.60;
+	public static double EXPIRATION_RATE = 0.60;
 
 	public Product(String name, double wholesalerPrice, boolean available, int stock) {
 		super();
@@ -53,7 +53,9 @@ public class Product {
 	public void setWholesalerPrice(double wholesalerPrice) {
 		this.wholesalerPrice = wholesalerPrice;
 	}
-
+        
+        
+        
 	public boolean isAvailable() {
 		return available;
 	}
